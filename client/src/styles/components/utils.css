@@ -1,0 +1,17 @@
+.react-select__input:focus {
+  --tw-ring-color: transparent;
+}
+
+.react-datepicker__current-month {
+  @apply text-gray-800;
+}
+.date-picker-wapper .react-datepicker__month-select {
+  padding: 0.125rem 0.5rem;
+  padding-right: 1.85rem;
+  @apply mt-0.5 border border-gray-300 rounded-sm py-0.75 focus:outline-none focus:ring-neutral-500 focus:border-neutral-500 text-sm
+}
+.date-picker-wapper .react-datepicker__year-select {
+  padding: 0.125rem 0.5rem;
+  padding-right: 2rem;
+  @apply mt-0.5 border border-gray-300 rounded-sm py-0.75 focus:outline-none focus:ring-neutral-500 focus:border-neutral-500 text-sm
+}
