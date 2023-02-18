@@ -2,6 +2,7 @@ import React from "react";
 
 type FilesListProps = {
   create: Function;
+  list?: any[];
 };
 
 const people = [
@@ -14,7 +15,7 @@ const people = [
   // More file...
 ];
 
-const FilesList: React.FC<FilesListProps> = ({ create }) => {
+const FilesList: React.FC<FilesListProps> = ({ create, list = people }) => {
   return (
     <div className='shadow sm:overflow-hidden sm:rounded-md'>
       <div className='space-y-6 bg-white py-6 px-4 sm:p-6'>
@@ -69,27 +70,37 @@ const FilesList: React.FC<FilesListProps> = ({ create }) => {
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-gray-200'>
-                  {people.map((person) => (
-                    <tr key={person.id}>
+                  {list?.map((item) => (
+                    <tr key={item.id}>
                       <td className='whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-gray-900 sm:pl-0'>
-                        {person.name}
+                        {item.name}
                       </td>
                       <td className='whitespace-nowrap py-4 px-3 text-sm text-gray-500'>
-                        {person.mimetype}
+                        {item.mimetype}
                       </td>
                       <td className='whitespace-nowrap py-4 px-3 text-sm text-gray-500'>
-                        {person.size}
+                        {item.size}
                       </td>
                       <td className='relative whitespace-nowrap py-4 pl-3 pr-6 text-right text-sm font-medium sm:pr-0'>
                         <a
                           href='#'
                           className='text-indigo-600 hover:text-indigo-900'
                         >
-                          Edit<span className='sr-only'>, {person.name}</span>
+                          Edit<span className='sr-only'>, {item.name}</span>
                         </a>
                       </td>
                     </tr>
                   ))}
+                  {!list?.length && (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className='whitespace-nowrap text-center py-4 px-3 text-sm text-gray-500'
+                      >
+                        Not found
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
