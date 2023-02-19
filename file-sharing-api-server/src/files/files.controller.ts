@@ -1,42 +1,44 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
+import { Express } from 'express';
 import { FilesService } from './files.service';
 import { CreateFileDto } from './dto/create-file.dto';
-import { UpdateFileDto } from './dto/update-file.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { DeleteFileDto } from './dto/delete-file.dto';
+import { unlink } from 'fs';
 
+@ApiTags('files')
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
-  @Post()
-  create(@Body() createFileDto: CreateFileDto) {
-    return this.filesService.create(createFileDto);
+  @Post('uploads')
+  @ApiOperation({ summary: 'Upload files' })
+  @UseInterceptors(FilesInterceptor('files', 5))
+  uploadFile(
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Body() body: CreateFileDto,
+  ) {
+    return files;
   }
 
-  @Get()
-  findAll() {
-    return this.filesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.filesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {
-    return this.filesService.update(+id, updateFileDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.filesService.remove(+id);
+  @Delete(':path')
+  @ApiOperation({ summary: 'Delete file with the path' })
+  deleteFile(@Param() { path }: DeleteFileDto) {
+    return new Promise((resolve, reject) => {
+      const filepath = `./public/${path}`;
+      unlink(filepath, function (err) {
+        if (err) return reject(err);
+        else return resolve(true);
+      });
+    });
   }
 }
