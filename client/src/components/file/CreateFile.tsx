@@ -1,3 +1,4 @@
+import { useCreateFileMutation } from "@/features/files/filesApiSlice";
 import React from "react";
 
 type CreateFileProps = {
@@ -5,8 +6,28 @@ type CreateFileProps = {
 };
 
 const CreateFile: React.FC<CreateFileProps> = ({ onClose }) => {
+  const [mutate, { isLoading }] = useCreateFileMutation();
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+  const formRef = React.useRef<HTMLFormElement | null>(null);
+
+  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files?.length) {
+      return;
+    }
+
+    const formData = new FormData();
+
+    Array.from(event.target.files).forEach((file) => {
+      formData.append(event.target.name, file);
+    });
+
+    mutate(formData);
+
+    formRef.current?.reset();
+  };
+
   return (
-    <form action='#' method='POST'>
+    <form action='#' ref={formRef}>
       <div className='shadow sm:overflow-hidden sm:rounded-md'>
         <div className='space-y-6 bg-white py-6 px-4 sm:p-6'>
           <div>
@@ -21,45 +42,37 @@ const CreateFile: React.FC<CreateFileProps> = ({ onClose }) => {
 
           <div className='grid grid-cols-3 gap-6'>
             <div className='col-span-3'>
-              <label className='block text-sm font-medium text-gray-700'>
-                Files
-              </label>
-              <div className='mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6'>
-                <div className='space-y-1 text-center'>
+              <label className='flex justify-center text-sm w-full h-32 px-4 transition bg-white border-2 border-gray-300 border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none'>
+                <span className='flex items-center space-x-2'>
                   <svg
-                    className='mx-auto h-12 w-12 text-gray-400'
-                    stroke='currentColor'
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='w-6 h-6 text-gray-600'
                     fill='none'
-                    viewBox='0 0 48 48'
-                    aria-hidden='true'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                    stroke-width='2'
                   >
                     <path
-                      d='M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02'
-                      strokeWidth={2}
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
+                      stroke-linecap='round'
+                      stroke-linejoin='round'
+                      d='M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12'
                     />
                   </svg>
-                  <div className='flex text-sm text-gray-600'>
-                    <label
-                      htmlFor='file-upload'
-                      className='relative cursor-pointer rounded-md bg-white font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500'
-                    >
-                      <span>Upload files</span>
-                      <input
-                        id='file-upload'
-                        name='file-upload'
-                        type='file'
-                        className='sr-only'
-                      />
-                    </label>
-                    <p className='pl-1'>or drag and drop</p>
-                  </div>
-                  <p className='text-xs text-gray-500'>
-                    PNG, JPG, GIF up to 10MB
-                  </p>
-                </div>
-              </div>
+                  <span className='text-gray-600'>
+                    Drop files to Attach, or{" "}
+                    <span className='text-blue-600 underline'>browse</span>
+                  </span>
+                </span>
+                <input
+                  ref={fileInputRef}
+                  type='file'
+                  name='files'
+                  id='file_upload'
+                  className='hidden'
+                  multiple
+                  onChange={onChangeHandler}
+                />
+              </label>
             </div>
           </div>
         </div>
@@ -76,7 +89,7 @@ const CreateFile: React.FC<CreateFileProps> = ({ onClose }) => {
             type='submit'
             className='ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
           >
-            Save
+            Upload
           </button>
         </div>
       </div>
