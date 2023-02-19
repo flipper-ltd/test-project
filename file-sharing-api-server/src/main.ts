@@ -14,10 +14,16 @@ import {
 
 async function bootstrap() {
   const logger = new Logger();
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    cors: {
+      origin: '*',
+    },
+  });
 
   app.setGlobalPrefix('api/v1');
-  app.useStaticAssets(join(__dirname, '..', 'public')); // prefix: '/public/',
+  app.useStaticAssets(join(__dirname, '..', 'public'), {
+    prefix: '/public/',
+  }); // prefix: '/public/',
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -39,7 +45,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config, options);
   SwaggerModule.setup('documentation', app, document);
 
-  const PORT = process.env.HTTP_PORT || 3001;
+  const PORT = process.env.PORT || 3001;
   await app.listen(PORT);
 
   logger.log(`Application is running on: ${await app.getUrl()}`);

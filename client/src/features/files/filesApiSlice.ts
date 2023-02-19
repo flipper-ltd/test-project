@@ -1,7 +1,7 @@
 import getConfig from "next/config";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { HYDRATE } from "next-redux-wrapper";
-import { RootState } from "@/lib/store";
+import { FileElement } from "@/components/file/create";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -15,21 +15,17 @@ export const filesApiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: publicRuntimeConfig.API_PATH,
     prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).user.auth?.accessToken;
-      if (token) {
-        headers.set("authorization", `Bearer ${token}`);
-      }
       return headers;
     },
   }),
   tagTypes: ["Files"],
   endpoints(builder) {
     return {
-      getFiles: builder.query<any[], void>({
+      getFiles: builder.query<FileElement[], void>({
         query: () => ({ url: `/files` }),
       }),
-      createFile: builder.mutation<any, Partial<any>>({
-        query: (body) => ({ url: "/files", method: "POST", body }),
+      createFile: builder.mutation<FileElement[], FormData>({
+        query: (body) => ({ url: "/files/uploads", method: "POST", body }),
       }),
     };
   },

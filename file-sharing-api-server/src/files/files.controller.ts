@@ -27,6 +27,8 @@ export class FilesController {
     @UploadedFiles() files: Array<Express.Multer.File>,
     @Body() body: CreateFileDto,
   ) {
+    console.log('body: ', body);
+    console.log('files: ', files);
     return files;
   }
 
