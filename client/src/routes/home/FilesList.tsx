@@ -20,8 +20,6 @@ const people = [
 
 const FilesList: React.FC<FilesListProps> = ({ create, list = people }) => {
   const { data, isLoading } = useGetFilesQuery();
-  console.log("isLoading: ", isLoading);
-  console.log("data: ", data);
 
   return (
     <div className='shadow sm:overflow-hidden sm:rounded-md'>
@@ -109,11 +107,16 @@ const FilesList: React.FC<FilesListProps> = ({ create, list = people }) => {
                       </td>
                     </tr>
                   )}
-                  {/* {isLoading && <tr>
-                        <td colSpan={4} className='relative whitespace-nowrap text-center py-4 px-3 text-sm text-gray-500'>
-                          <LoadingSpin />
-                        </td>
-                      <tr/>} */}
+                  {isLoading && (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className='relative whitespace-nowrap text-center py-5 px-3 text-sm text-gray-500'
+                      >
+                        <LoadingSpin className='text-indigo-500' />
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

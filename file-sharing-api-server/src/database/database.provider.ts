@@ -11,9 +11,7 @@ export const databaseProviders = [
     provide: 'DATABASE_CONNECTION',
     useFactory: async (): Promise<JsonDB> => {
       try {
-        const db = new JsonDB(
-          new Config('file-sharing-database', true, false, '/'),
-        );
+        const db = new JsonDB(new Config('database', true, false, '/'));
         return db;
       } catch (error) {
         throw error;
