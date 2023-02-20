@@ -7,11 +7,19 @@ export class FilesService {
   constructor(@Inject('DATABASE_CONNECTION') private db: JsonDB) {}
 
   async create(createFileDto: { files: FileElement[] }) {
-    this.db.push('/files', createFileDto.files);
+    const data = await this.findAll();
+    data.unshift(...createFileDto.files);
+    this.db.push('/files', data);
   }
 
-  findAll(): Promise<FileElement[]> {
-    return this.db.getData('/files');
+  async findAll(): Promise<FileElement[]> {
+    let data: FileElement[];
+    try {
+      data = await this.db.getData('/files');
+    } catch (error) {
+      data = [];
+    }
+    return data;
   }
 
   remove(id: number) {
