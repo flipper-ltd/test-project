@@ -4,6 +4,8 @@
 */resources
 */uploads
 
+*-sharing-database.json
+
 # Logs
 logs
 *.log

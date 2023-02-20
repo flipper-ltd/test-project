@@ -1,3 +1,6 @@
+import { LoadingSpin } from "@/components/Button";
+import { FileElement } from "@/components/file/create";
+import { useGetFilesQuery } from "@/features/files/filesApiSlice";
 import React from "react";
 
 type FilesListProps = {
@@ -16,6 +19,10 @@ const people = [
 ];
 
 const FilesList: React.FC<FilesListProps> = ({ create, list = people }) => {
+  const { data, isLoading } = useGetFilesQuery();
+  console.log("isLoading: ", isLoading);
+  console.log("data: ", data);
+
   return (
     <div className='shadow sm:overflow-hidden sm:rounded-md'>
       <div className='space-y-6 bg-white py-6 px-4 sm:p-6'>
@@ -70,10 +77,10 @@ const FilesList: React.FC<FilesListProps> = ({ create, list = people }) => {
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-gray-200'>
-                  {list?.map((item) => (
-                    <tr key={item.id}>
+                  {data?.map((item: FileElement) => (
+                    <tr key={item.filename}>
                       <td className='whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-gray-900 sm:pl-0'>
-                        {item.name}
+                        {item.originalname}
                       </td>
                       <td className='whitespace-nowrap py-4 px-3 text-sm text-gray-500'>
                         {item.mimetype}
@@ -86,12 +93,13 @@ const FilesList: React.FC<FilesListProps> = ({ create, list = people }) => {
                           href='#'
                           className='text-indigo-600 hover:text-indigo-900'
                         >
-                          Edit<span className='sr-only'>, {item.name}</span>
+                          Edit
+                          <span className='sr-only'>, {item.originalname}</span>
                         </a>
                       </td>
                     </tr>
                   ))}
-                  {!list?.length && (
+                  {!data?.length && (
                     <tr>
                       <td
                         colSpan={4}
@@ -101,6 +109,11 @@ const FilesList: React.FC<FilesListProps> = ({ create, list = people }) => {
                       </td>
                     </tr>
                   )}
+                  {/* {isLoading && <tr>
+                        <td colSpan={4} className='relative whitespace-nowrap text-center py-4 px-3 text-sm text-gray-500'>
+                          <LoadingSpin />
+                        </td>
+                      <tr/>} */}
                 </tbody>
               </table>
             </div>

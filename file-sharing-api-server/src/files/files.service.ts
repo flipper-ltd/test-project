@@ -1,23 +1,17 @@
-import { Injectable } from '@nestjs/common';
-import { CreateFileDto } from './dto/create-file.dto';
-import { UpdateFileDto } from './dto/update-file.dto';
+import { Inject, Injectable } from '@nestjs/common';
+import { JsonDB } from 'node-json-db';
+import { FileElement } from './schemas/file.schema';
 
 @Injectable()
 export class FilesService {
-  create(createFileDto: CreateFileDto) {
-    return 'This action adds a new file';
+  constructor(@Inject('DATABASE_CONNECTION') private db: JsonDB) {}
+
+  async create(createFileDto: { files: FileElement[] }) {
+    this.db.push('/files', createFileDto.files);
   }
 
-  findAll() {
-    return `This action returns all files`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} file`;
-  }
-
-  update(id: number, updateFileDto: UpdateFileDto) {
-    return `This action updates a #${id} file`;
+  findAll(): Promise<FileElement[]> {
+    return this.db.getData('/files');
   }
 
   remove(id: number) {

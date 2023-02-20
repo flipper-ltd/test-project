@@ -5,9 +5,11 @@ import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { diskStorage } from 'multer';
 import { createId } from '@paralleldrive/cuid2';
+import { DatabaseModule } from 'src/database/database.module';
 
 @Module({
   imports: [
+    DatabaseModule,
     MulterModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

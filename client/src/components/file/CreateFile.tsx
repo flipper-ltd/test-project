@@ -1,6 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useCreateFileMutation } from "@/features/files/filesApiSlice";
+import {
+  useCreateFileMutation,
+  useGetFilesQuery,
+} from "@/features/files/filesApiSlice";
 import { CancelButton, SubmitButton } from "../Button";
 
 type CreateFileProps = {
@@ -15,6 +18,7 @@ const CreateFile: React.FC<CreateFileProps> = ({ onClose }) => {
   const { handleSubmit, setValue } = useForm<CreateFileInput>({
     defaultValues: {},
   });
+  const { refetch } = useGetFilesQuery();
   const [mutate, { isLoading }] = useCreateFileMutation();
   const formRef = React.useRef<HTMLFormElement | null>(null);
 
@@ -29,7 +33,11 @@ const CreateFile: React.FC<CreateFileProps> = ({ onClose }) => {
   };
 
   function onSubmit({ files }: CreateFileInput) {
-    if (files) mutate(files);
+    if (files)
+      mutate(files).then(() => {
+        refetch();
+        onClose();
+      });
   }
 
   return (
