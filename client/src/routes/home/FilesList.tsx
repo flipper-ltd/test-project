@@ -1,8 +1,8 @@
 import React from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { LoadingSpin } from "@/components/Button";
-import { FileElement } from "@/components/file/create";
 import { useGetFilesQuery } from "@/features/files/filesApiSlice";
+import { FileElement } from "@/types/file.schema";
 
 type FilesListProps = {
   create: Function;

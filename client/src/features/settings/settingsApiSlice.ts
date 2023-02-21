@@ -1,12 +1,12 @@
 import getConfig from "next/config";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { HYDRATE } from "next-redux-wrapper";
-import { FileElement } from "@/types/file.schema";
+import { Setting } from "@/types/setting.schema";
 
 const { publicRuntimeConfig } = getConfig();
 
-export const filesApiSlice = createApi({
-  reducerPath: "files-api",
+export const settingsApiSlice = createApi({
+  reducerPath: "settings-api",
   extractRehydrationInfo(action, { reducerPath }) {
     if (action.type === HYDRATE) {
       return action.payload[reducerPath];
@@ -18,14 +18,14 @@ export const filesApiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Files"],
+  tagTypes: ["Settings"],
   endpoints(builder) {
     return {
-      getFiles: builder.query<FileElement[], void>({
-        query: () => ({ url: `/files` }),
+      getSettings: builder.query<Setting, void>({
+        query: () => ({ url: `/settings` }),
       }),
-      createFile: builder.mutation<FileElement[], FormData>({
-        query: (body) => ({ url: "/files", method: "POST", body }),
+      createSetting: builder.mutation<Setting, Setting>({
+        query: (body) => ({ url: "/settings", method: "POST", body }),
       }),
     };
   },
@@ -33,10 +33,10 @@ export const filesApiSlice = createApi({
 
 // export hooks for usage in functional components
 export const {
-  useGetFilesQuery,
-  useCreateFileMutation,
+  useGetSettingsQuery,
+  useCreateSettingMutation,
   util: { getRunningQueriesThunk, getRunningMutationsThunk },
-} = filesApiSlice;
+} = settingsApiSlice;
 
 // export endpoints for use in SSR
-export const { getFiles, createFile } = filesApiSlice.endpoints;
+export const { getSettings, createSetting } = settingsApiSlice.endpoints;

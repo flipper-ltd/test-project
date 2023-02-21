@@ -15,6 +15,7 @@ import autoMergeLevel1 from "reduxjs-toolkit-persist/lib/stateReconciler/autoMer
 import logger from "redux-logger";
 import navigationReducer from "@/features/navigation/navigationSlice";
 import { filesApiSlice } from "@/features/files/filesApiSlice";
+import { settingsApiSlice } from "@/features/settings/settingsApiSlice";
 
 const persistConfig = {
   key: "root",
@@ -26,6 +27,7 @@ const persistConfig = {
 const _persistedReducer = persistCombineReducers(persistConfig, {
   navigation: navigationReducer,
   [filesApiSlice.reducerPath]: filesApiSlice.reducer,
+  [settingsApiSlice.reducerPath]: settingsApiSlice.reducer,
 });
 
 export const makeStore = () =>
@@ -38,7 +40,7 @@ export const makeStore = () =>
           ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
           // ignoredActionPaths: ["navigation/setNavigation"],
         },
-      }).concat(filesApiSlice.middleware),
+      }).concat(filesApiSlice.middleware, settingsApiSlice.middleware),
     devTools: process.env.NODE_ENV !== "production",
   });
 

@@ -5,7 +5,6 @@ import { SettingsService } from './settings.service';
 const mockSettingsService = () => ({
   create: jest.fn((x) => x),
   findAll: jest.fn((x) => x),
-  removeAll: jest.fn((x) => x),
 });
 
 describe('SettingsController', () => {
@@ -56,14 +55,6 @@ describe('SettingsController', () => {
         .mockImplementation(async () => result);
 
       expect(await settingsService.create(result)).toBe(result);
-    });
-  });
-
-  describe('Create', () => {
-    it('should create setting', async () => {
-      jest.spyOn(settingsService, 'removeAll').mockImplementation();
-
-      expect(await settingsService.removeAll()).toBeUndefined();
     });
   });
 });
