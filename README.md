@@ -21,9 +21,11 @@ FOLDER=
 ```sh
 pnpm install
 pnpm build && pnpm start:prod
+```
 
 or
 
+```sh
 npm install
 npm run build && npm run start:prod
 ```
@@ -47,9 +49,11 @@ API_URL=http://localhost:{SERVER_PORT}/api/v1
 ```sh
 pnpm install
 pnpm build && pnpm start
+```
 
 or
 
+```sh
 npm install
 npm run build && npm run start
 ```
