@@ -1,24 +1,14 @@
+import React from "react";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 import { LoadingSpin } from "@/components/Button";
 import { FileElement } from "@/components/file/create";
 import { useGetFilesQuery } from "@/features/files/filesApiSlice";
-import React from "react";
 
 type FilesListProps = {
   create: Function;
-  list?: any[];
 };
 
-const people = [
-  {
-    id: `${new Date().getTime()}`,
-    name: "Lindsay Walton",
-    mimetype: "Front-end Developer",
-    size: "lindsay.walton@example.com",
-  },
-  // More file...
-];
-
-const FilesList: React.FC<FilesListProps> = ({ create, list = people }) => {
+const FilesList: React.FC<FilesListProps> = ({ create }) => {
   const { data, isLoading } = useGetFilesQuery();
 
   return (
@@ -75,29 +65,64 @@ const FilesList: React.FC<FilesListProps> = ({ create, list = people }) => {
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-gray-200'>
-                  {data?.map((item: FileElement) => (
-                    <tr key={item.filename}>
-                      <td className='whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-gray-900 sm:pl-0'>
-                        {item.originalname}
-                      </td>
-                      <td className='whitespace-nowrap py-4 px-3 text-sm text-gray-500'>
-                        {item.mimetype}
-                      </td>
-                      <td className='whitespace-nowrap py-4 px-3 text-sm text-gray-500'>
-                        {item.size}
-                      </td>
-                      <td className='relative whitespace-nowrap py-4 pl-3 pr-6 text-right text-sm font-medium sm:pr-0'>
-                        <a
-                          href='#'
-                          className='text-indigo-600 hover:text-indigo-900'
-                        >
-                          Edit
-                          <span className='sr-only'>, {item.originalname}</span>
-                        </a>
-                      </td>
-                    </tr>
-                  ))}
-                  {!data?.length && (
+                  {!isLoading &&
+                    data?.map((item: FileElement) => (
+                      <tr key={item.filename}>
+                        <td className='py-4 pl-6 pr-3 text-sm font-medium break-all break-words text-gray-900 sm:pl-0'>
+                          {item.originalname}
+                        </td>
+                        <td className='py-4 px-3 text-sm break-all break-words text-gray-500 space-y-2.5'>
+                          <span className='font-medium'>{item.mimetype}</span>
+                          <ul role='list' className='space-y-2.5'>
+                            <li>
+                              <span className='font-semibold'>
+                                Private Key:{" "}
+                              </span>
+                              <span className='prose font-light text-sm'>
+                                {item.privateKey}
+                              </span>
+                              <CopyToClipboard text={`${item.privateKey}`}>
+                                <button>
+                                  <span className='ml-2 inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800'>
+                                    Copy to clipboard
+                                  </span>
+                                </button>
+                              </CopyToClipboard>
+                            </li>
+                            <li>
+                              <span className='font-semibold'>
+                                Public Key:{" "}
+                              </span>
+                              <span className='prose font-light text-sm'>
+                                {item.publicKey}
+                              </span>
+                              <CopyToClipboard text={`${item.publicKey}`}>
+                                <button>
+                                  <span className='ml-2 inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800'>
+                                    Copy to clipboard
+                                  </span>
+                                </button>
+                              </CopyToClipboard>
+                            </li>
+                          </ul>
+                        </td>
+                        <td className='py-4 px-3 text-sm text-gray-500'>
+                          {item.size}
+                        </td>
+                        <td className='relative whitespace-nowrap py-4 pl-3 pr-6 text-right text-sm font-medium sm:pr-0'>
+                          <a
+                            href='#'
+                            className='text-indigo-600 hover:text-indigo-900'
+                          >
+                            Edit
+                            <span className='sr-only'>
+                              , {item.originalname}
+                            </span>
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                  {!isLoading && !data?.length && (
                     <tr>
                       <td
                         colSpan={4}

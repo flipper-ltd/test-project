@@ -25,7 +25,7 @@ export const filesApiSlice = createApi({
         query: () => ({ url: `/files` }),
       }),
       createFile: builder.mutation<FileElement[], FormData>({
-        query: (body) => ({ url: "/files/uploads", method: "POST", body }),
+        query: (body) => ({ url: "/files", method: "POST", body }),
       }),
     };
   },

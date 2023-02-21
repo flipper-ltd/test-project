@@ -7,6 +7,7 @@ import {
   UseInterceptors,
   UploadedFiles,
   Get,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Express } from 'express';
 import { FilesService } from './files.service';
@@ -16,6 +17,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { DeleteFileDto } from './dto/delete-file.dto';
 import { unlink } from 'fs';
 import { FileElement } from './schemas/file.schema';
+import { GetFileDto } from './dto/get-file.dto';
 
 @ApiTags('files')
 @Controller('files')
@@ -28,31 +30,46 @@ export class FilesController {
     return this.filesService.findAll();
   }
 
-  @Post('uploads')
+  @Post()
   @ApiOperation({ summary: 'Upload files' })
   @UseInterceptors(FilesInterceptor('files', 5))
   uploadFile(
     @UploadedFiles() files: Array<Express.Multer.File>,
     @Body() body: CreateFileDto, // eslint-disable-line
   ) {
-    const data = {
-      files: files.map((item) => ({
-        ...item,
-        privateKey: '',
-        publicKey: '',
-      })),
-    };
-    return this.filesService.create(data);
+    const createFileDto = { files };
+    return this.filesService.create(createFileDto);
   }
 
-  @Delete(':path')
+  @Get(':publicKey')
+  @ApiOperation({ summary: 'GET all files' })
+  findByKey(@Param() { publicKey }: GetFileDto): Promise<FileElement> {
+    return this.filesService.findByKey(publicKey);
+  }
+
+  @Delete(':privateKey')
   @ApiOperation({ summary: 'Delete file with the path' })
-  deleteFile(@Param() { path }: DeleteFileDto) {
+  async deleteFile(@Param() { privateKey }: DeleteFileDto) {
+    try {
+      const file = await this.filesService.findByKey(privateKey);
+      if (privateKey === file.privateKey) {
+        await this.deleteFileFromDisk(file.path);
+        return this.filesService.remove(file);
+      }
+      return new ForbiddenException('Access Denied');
+    } catch (error) {
+      throw new ForbiddenException('Access Denied');
+    }
+  }
+
+  deleteFileFromDisk(path: string) {
     return new Promise((resolve, reject) => {
-      const filepath = `./public/${path}`;
-      unlink(filepath, function (err) {
-        if (err) return reject(err);
-        else return resolve(true);
+      unlink(path, (err) => {
+        if (err) {
+          return reject(err);
+        } else {
+          return resolve(true);
+        }
       });
     });
   }

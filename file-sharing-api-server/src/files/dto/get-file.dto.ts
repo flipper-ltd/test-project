@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class DeleteFileDto {
+export class GetFileDto {
   @ApiProperty()
-  privateKey: string;
+  publicKey: string;
 }
