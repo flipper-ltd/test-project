@@ -31,6 +31,7 @@ npm run build && npm run start:prod
 ## Usage (API server)
 
 Swagger API url: `http://localhost:{PORT}/documentation`
+<br/>
 API Endpoint: `http://localhost:{PORT}/api/v1`
 
 ## Navigate to the `Client`; `cd client`
