@@ -41,7 +41,7 @@ API Endpoint: `http://localhost:{PORT}/api/v1`
 Create a `.env` file for Client (frontend)
 
 ```sh
-API_URL=http://localhost:{SERVER_PORT}/api/v1
+API_URL=http://localhost:{PORT}/api/v1 # PORT = API_SERVER_PORT
 ```
 
 ## Install
