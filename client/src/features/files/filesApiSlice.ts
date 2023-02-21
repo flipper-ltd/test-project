@@ -2,6 +2,7 @@ import getConfig from "next/config";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { HYDRATE } from "next-redux-wrapper";
 import { FileElement } from "@/types/file.schema";
+import { StreamPipeOptions } from "stream/web";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -21,11 +22,27 @@ export const filesApiSlice = createApi({
   tagTypes: ["Files"],
   endpoints(builder) {
     return {
+      createFile: builder.mutation<FileElement[], FormData>({
+        query: (body) => ({ url: "/files", method: "POST", body }),
+      }),
       getFiles: builder.query<FileElement[], void>({
         query: () => ({ url: `/files` }),
       }),
-      createFile: builder.mutation<FileElement[], FormData>({
-        query: (body) => ({ url: "/files", method: "POST", body }),
+      getFile: builder.query<FileElement, string>({
+        query: (publicKey) => ({
+          url: `/files/${encodeURIComponent(publicKey)}`,
+        }),
+      }),
+      deleteFile: builder.mutation<FileElement, string>({
+        query: (privateKey) => ({
+          url: `/files/${encodeURIComponent(privateKey)}`,
+          method: "DELETE",
+        }),
+      }),
+      getDownloadFile: builder.query<StreamPipeOptions, string>({
+        query: (publicKey) => ({
+          url: `/files/download/${encodeURIComponent(publicKey)}`,
+        }),
       }),
     };
   },
@@ -35,8 +52,12 @@ export const filesApiSlice = createApi({
 export const {
   useGetFilesQuery,
   useCreateFileMutation,
+  useLazyGetFileQuery,
+  useLazyGetDownloadFileQuery,
+  useDeleteFileMutation,
   util: { getRunningQueriesThunk, getRunningMutationsThunk },
 } = filesApiSlice;
 
 // export endpoints for use in SSR
-export const { getFiles, createFile } = filesApiSlice.endpoints;
+export const { getFiles, createFile, getFile, deleteFile, getDownloadFile } =
+  filesApiSlice.endpoints;

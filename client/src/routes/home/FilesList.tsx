@@ -3,6 +3,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import { LoadingSpin } from "@/components/Button";
 import { useGetFilesQuery } from "@/features/files/filesApiSlice";
 import { FileElement } from "@/types/file.schema";
+import FileAction from "@/components/file/FileAction";
 
 type FilesListProps = {
   create: Function;
@@ -105,6 +106,7 @@ const FilesList: React.FC<FilesListProps> = ({ create }) => {
                               </CopyToClipboard>
                             </li>
                           </ul>
+                          <FileAction />
                         </td>
                         <td className='py-4 px-3 text-sm text-gray-500'>
                           {item.size}

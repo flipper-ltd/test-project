@@ -8,6 +8,7 @@ import {
   UploadedFiles,
   Get,
   ForbiddenException,
+  StreamableFile,
 } from '@nestjs/common';
 import { Express } from 'express';
 import { FilesService } from './files.service';
@@ -15,19 +16,36 @@ import { CreateFileDto } from './dto/create-file.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { DeleteFileDto } from './dto/delete-file.dto';
-import { unlink } from 'fs';
+import { createReadStream, unlink } from 'fs';
 import { FileElement } from './schemas/file.schema';
 import { GetFileDto } from './dto/get-file.dto';
+import { join } from 'path';
 
 @ApiTags('files')
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
+  @Get(':publicKey')
+  @ApiOperation({ summary: 'GET all files' })
+  findByKey(@Param() { publicKey }: GetFileDto): Promise<FileElement> {
+    return this.filesService.findByKey(publicKey);
+  }
+
   @Get()
   @ApiOperation({ summary: 'GET all files' })
   findAll(): Promise<FileElement[]> {
     return this.filesService.findAll();
+  }
+
+  @Get('download/:publicKey')
+  @ApiOperation({ summary: 'GET download files' })
+  async getDownload(
+    @Param() { publicKey }: GetFileDto,
+  ): Promise<StreamableFile> {
+    const res: FileElement = await this.filesService.findByKey(publicKey);
+    const file = createReadStream(join(process.cwd(), res.path));
+    return new StreamableFile(file);
   }
 
   @Post()
@@ -39,12 +57,6 @@ export class FilesController {
   ) {
     const createFileDto = { files };
     return this.filesService.create(createFileDto);
-  }
-
-  @Get(':publicKey')
-  @ApiOperation({ summary: 'GET all files' })
-  findByKey(@Param() { publicKey }: GetFileDto): Promise<FileElement> {
-    return this.filesService.findByKey(publicKey);
   }
 
   @Delete(':privateKey')
