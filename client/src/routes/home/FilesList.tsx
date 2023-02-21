@@ -43,6 +43,12 @@ const FilesList: React.FC<FilesListProps> = ({ create }) => {
                       scope='col'
                       className='py-3.5 pl-6 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0'
                     >
+                      #
+                    </th>
+                    <th
+                      scope='col'
+                      className='py-3.5 px-3 text-left text-sm font-semibold text-gray-900'
+                    >
                       Name
                     </th>
                     <th
@@ -67,9 +73,12 @@ const FilesList: React.FC<FilesListProps> = ({ create }) => {
                 </thead>
                 <tbody className='divide-y divide-gray-200'>
                   {!isLoading &&
-                    data?.map((item: FileElement) => (
+                    data?.map((item: FileElement, index: number) => (
                       <tr key={item.filename}>
                         <td className='py-4 pl-6 pr-3 text-sm font-medium break-all break-words text-gray-900 sm:pl-0'>
+                          {index + 1}.
+                        </td>
+                        <td className='py-4 px-3 text-sm font-medium break-all break-words text-gray-900 sm:pl-0'>
                           {item.originalname}
                         </td>
                         <td className='py-4 px-3 text-sm break-all break-words text-gray-500 space-y-2.5'>
