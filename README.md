@@ -7,9 +7,9 @@
 
 > Test Project
 
-# Navigate to the `API server`; `cd file-sharing-api-server`
+## Navigate to the `API server`; `cd file-sharing-api-server`
 
-## Create a `.env` file for API server
+Create a `.env` file for API server
 
 ```sh
 PORT=
@@ -33,9 +33,9 @@ npm run build && npm run start:prod
 Swagger API url: `http://localhost:{PORT}/documentation`
 API Endpoint: `http://localhost:{PORT}/api/v1`
 
-# Navigate to the `Client`; `cd client`
+## Navigate to the `Client`; `cd client`
 
-## Create a `.env` file for Client (frontend)
+Create a `.env` file for Client (frontend)
 
 ```sh
 API_URL=http://localhost:{SERVER_PORT}/api/v1
