@@ -73,7 +73,7 @@ pnpm test
 ### After every 2 minutes
 
 An internal job to cleanup uploaded files after configurable
-period of inactivity. Default is 2 minutes.
+period of inactivity. Default 2 minutes.
 
 ## Author
 
