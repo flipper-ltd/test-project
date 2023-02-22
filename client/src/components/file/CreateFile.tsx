@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   useCreateFileMutation,
   useGetFilesQuery,
 } from "@/features/files/filesApiSlice";
 import { CancelButton, SubmitButton } from "../Button";
+
+type FileDetails = {
+  name: string;
+  size: number;
+};
 
 type CreateFileProps = {
   onClose: Function;
@@ -18,6 +23,7 @@ const CreateFile: React.FC<CreateFileProps> = ({ onClose }) => {
   const { handleSubmit, setValue, reset } = useForm<CreateFileInput>({
     defaultValues: {},
   });
+  const [fileDetails, setFileDetails] = useState<FileDetails[]>([]);
   const { refetch } = useGetFilesQuery();
   const [mutate, { isLoading }] = useCreateFileMutation();
   const formRef = React.useRef<HTMLFormElement | null>(null);
@@ -25,10 +31,13 @@ const CreateFile: React.FC<CreateFileProps> = ({ onClose }) => {
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files?.length) return;
     const formData = new FormData();
+    const details: FileDetails[] = [];
     Array.from(event.target.files).forEach((file) => {
+      details.push({ name: file.name, size: file.size });
       formData.append("files", file);
     });
     setValue("files", formData);
+    setFileDetails(details);
     formRef.current?.reset();
   };
 
@@ -37,6 +46,7 @@ const CreateFile: React.FC<CreateFileProps> = ({ onClose }) => {
       mutate(files).then(() => {
         refetch();
         reset();
+        setFileDetails([]);
         onClose();
       });
   }
@@ -93,6 +103,34 @@ const CreateFile: React.FC<CreateFileProps> = ({ onClose }) => {
             </div>
           </div>
         </div>
+
+        {!!fileDetails.length && (
+          <ul
+            role='list'
+            className='bg-white pb-6 px-4 sm:px-6 divide-y divide-gray-200'
+          >
+            {fileDetails.map((fileDetail: FileDetails, index: number) => (
+              <li
+                key={fileDetail.name + index}
+                className='relative bg-white py-5 px-4 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 hover:bg-gray-50'
+              >
+                <div className='flex justify-between space-x-3'>
+                  <div className='min-w-0 flex-1'>
+                    <a href='#' className='block focus:outline-none'>
+                      <span className='absolute inset-0' aria-hidden='true' />
+                      <p className='truncate text-sm font-medium text-gray-900'>
+                        {fileDetail.name}
+                      </p>
+                    </a>
+                  </div>
+                  <span className='flex-shrink-0 whitespace-nowrap text-sm text-gray-500'>
+                    {fileDetail.size}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
 
         <div className='bg-gray-50 px-4 py-3 sm:px-6 flex justify-end'>
           <CancelButton onClick={() => onClose()}>Cancel</CancelButton>
