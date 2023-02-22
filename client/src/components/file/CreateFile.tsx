@@ -15,7 +15,7 @@ type CreateFileInput = {
 };
 
 const CreateFile: React.FC<CreateFileProps> = ({ onClose }) => {
-  const { handleSubmit, setValue } = useForm<CreateFileInput>({
+  const { handleSubmit, setValue, reset } = useForm<CreateFileInput>({
     defaultValues: {},
   });
   const { refetch } = useGetFilesQuery();
@@ -36,6 +36,7 @@ const CreateFile: React.FC<CreateFileProps> = ({ onClose }) => {
     if (files)
       mutate(files).then(() => {
         refetch();
+        reset();
         onClose();
       });
   }
