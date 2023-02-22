@@ -68,6 +68,12 @@ And then navigate to the `http://localhost:{PORT}`
 pnpm test
 ```
 
+## Cron job
+
+### After every 2 minutes
+
+cleanup uploaded files after configurable period of inactivity. default 2 minutes
+
 ## Author
 
 👤 **Ikram Ud Daula**
