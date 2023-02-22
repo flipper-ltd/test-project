@@ -16,7 +16,7 @@ import { CreateFileDto } from './dto/create-file.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { DeleteFileDto } from './dto/delete-file.dto';
-import { createReadStream, unlink } from 'fs';
+import { createReadStream } from 'fs';
 import { FileElement } from './schemas/file.schema';
 import { GetFileDto } from './dto/get-file.dto';
 import { join } from 'path';
@@ -65,24 +65,11 @@ export class FilesController {
     try {
       const file = await this.filesService.findByKey(privateKey);
       if (privateKey === file.privateKey) {
-        await this.deleteFileFromDisk(file.path);
         return this.filesService.remove(file);
       }
       return new ForbiddenException('Access Denied');
     } catch (error) {
       throw new ForbiddenException('Access Denied');
     }
-  }
-
-  deleteFileFromDisk(path: string) {
-    return new Promise((resolve, reject) => {
-      unlink(path, (err) => {
-        if (err) {
-          return reject(err);
-        } else {
-          return resolve(true);
-        }
-      });
-    });
   }
 }

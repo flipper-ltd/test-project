@@ -23,4 +23,7 @@ export interface FileElement {
   privateKey?: string;
   /** Limited access, publicly accessable who has the link. */
   publicKey?: string;
+
+  createdAt?: Date;
+  lastReadAt?: Date;
 }

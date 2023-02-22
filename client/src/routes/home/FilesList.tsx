@@ -75,7 +75,7 @@ const FilesList: React.FC<FilesListProps> = ({ create }) => {
                   {!isLoading &&
                     data?.map((item: FileElement, index: number) => (
                       <tr key={item.filename}>
-                        <td className='py-4 pl-6 pr-3 text-sm font-medium break-all break-words text-gray-900 sm:pl-0'>
+                        <td className='py-4 pl-6 pr-3 text-sm font-medium text-gray-900 sm:pl-0'>
                           {index + 1}.
                         </td>
                         <td className='py-4 px-3 text-sm font-medium break-all break-words text-gray-900 sm:pl-0'>

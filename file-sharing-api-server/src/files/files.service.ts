@@ -1,10 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
+import { Cron } from '@nestjs/schedule';
 import { JsonDB } from 'node-json-db';
 import { AccessKeys } from './interfaces/keys.interface';
 import { FileElement } from './schemas/file.schema';
+import { unlink } from 'fs';
+
 @Injectable()
 export class FilesService {
+  private readonly logger = new Logger(FilesService.name);
   constructor(@Inject('DATABASE_CONNECTION') private db: JsonDB) {}
 
   async create(createFileDto: { files: FileElement[] }) {
@@ -15,6 +24,8 @@ export class FilesService {
       return {
         ...item,
         ...keys,
+        createdAt: new Date(),
+        lastReadAt: new Date(),
       };
     });
     data.unshift(...filesCreated);
@@ -31,28 +42,46 @@ export class FilesService {
     return data;
   }
 
+  /**
+   * findByKey method will be optimize when using real database.
+   * @param key string
+   * @returns FileElement
+   */
+
   async findByKey(key: string): Promise<FileElement> {
-    let data: FileElement;
+    let fileItem: FileElement;
     try {
       const files: FileElement[] = await this.db.getData('/files');
-      if (key) {
-        data = files.find((item) => {
-          const id: string = item.filename.split('__')[0];
-          return bcrypt.compareSync(id, key);
-        });
-      }
+      fileItem = files.find((item) => {
+        const id: string = item.filename.split('__')[0];
+        return bcrypt.compareSync(id, key);
+      });
+      const data = files.filter((item: FileElement) => {
+        if (item.filename === fileItem.filename) {
+          return { ...item, lastReadAt: new Date() };
+        }
+        return item;
+      });
+      await this.db.push('/files', data);
     } catch (error) {
-      data = null;
+      fileItem = null;
     }
-    return data;
+    return fileItem;
   }
 
   async remove(file: FileElement): Promise<FileElement> {
-    const data = await this.findAll();
-    const fileIndex = data.findIndex((item) => file.filename === item.filename);
-    const [removedFile] = data.splice(fileIndex, 1);
-    this.db.push('/files', data);
-    return removedFile;
+    try {
+      const data = await this.findAll();
+      const fileIndex = data.findIndex(
+        (item) => file.filename === item.filename,
+      );
+      const [removedFile] = data.splice(fileIndex, 1);
+      await this.deleteFileFromDisk(removedFile.path);
+      await this.db.push('/files', data);
+      return removedFile;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 
   getKeys(id: string): AccessKeys {
@@ -68,5 +97,35 @@ export class FilesService {
   hashData(data: string): string {
     const salt = bcrypt.genSaltSync(10);
     return bcrypt.hashSync(data, salt);
+  }
+
+  @Cron('0 */2 * * * *') // each after two minutes
+  async handleCron() {
+    const data = await this.findAll();
+    const refreshData: FileElement[] = [];
+    for (let i = 0; i < data.length; i++) {
+      if (
+        new Date(data[i].lastReadAt).getTime() + 1000 * 60 * 2 <=
+        new Date().getTime()
+      ) {
+        this.logger.log(`File "${data[i].originalname}" to be deleted`);
+        await this.deleteFileFromDisk(data[i].path);
+      } else {
+        refreshData.push(data[i]);
+      }
+    }
+    await this.db.push('/files', refreshData);
+  }
+
+  deleteFileFromDisk(path: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      unlink(path, (err) => {
+        if (err) {
+          return reject(err);
+        } else {
+          return resolve(true);
+        }
+      });
+    });
   }
 }
